@@ -1,7 +1,7 @@
 ---
-eip: aura ... _(number to be assigned)_
+eip: aura
 title: Aura: Authority Round (PoA) Consensus Protocol
-author: Aidan Hyman (@ChainSafe), Afri Schoedon (@5chdn) ... _(list to be completed)_
+author: Peter Czaban (@keorn), Robert Habermeier (@rphmeier), André Silva (@andresilva), Afri Schoedon (@5chdn), Aidan Hyman (@ChainSafe)
 discussions-to: https://github.com/goerli/eips-aura-spec
 status: Work in progress (WIP)
 type: Informational
