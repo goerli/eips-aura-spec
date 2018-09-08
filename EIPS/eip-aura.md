@@ -16,7 +16,7 @@ Aura (_Authority Round_) is a proof-of-authority blockchain consensus algorithm 
 
 Aura is the consensus engine pioneered by [Parity Technologies](https://parity.io) in 2016 and used to power the [public Kovan testnet](https://medium.com/@Digix/announcing-kovan-a-stable-ethereum-public-testnet-10ac7cb6c85f) which was established after the [Ropsten spam-attacks](https://ethereum.stackexchange.com/questions/12477/ropsten-testnet-is-under-kind-of-attack-what-can-we-do) in 2017. Besides, public value-bearing networks, such as the [POA Network](https://poa.network/), are based on the Aura protocol today.
 
-This document is _informational_ and summarizes the available technical specification of the consensus engine. This provides other client developer teams an overviewer, a place for feedback and potentially the foundation to implement this in other code bases.
+This document is _informational_ and summarizes the available technical specification of the consensus engine. This provides other client developer teams an overview, a place for feedback and potentially the foundation to implement this in other code bases.
 
 ## Motivation
 Networks bearing no value cannot be sufficiently secured with proof-of-work or proof-of-stake. This circumstance is uniquely right for test networks that are supposed to be a reliable platform for developers to deploy and test their applications. Therefore, a proof-of-authority scheme is proposed which provides sufficient resistance against network attacks in testnets without any value attached.
