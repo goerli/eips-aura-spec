@@ -43,6 +43,41 @@ At each step `s`, a _primary_ is assigned. Only the primary at a step may issue 
 
 The protocol contains a chain scoring rule `SCORE(C)` for a given chain `C`. On each step, each honest node propagates the chain with the highest score it knows about to all other nodes. Honest primaries only issue blocks on top of the best chain they are aware of during their turn.
 
+### Sealing
+
+The seal is part of the block header and appended accordingly. For Parity Ethereum, this is:
+
+```rust
+/// Place the header into an RLP stream `s`, optionally `with_seal`.
+fn stream_rlp(&self, s: &mut RlpStream, with_seal: Seal) {
+	if let Seal::With = with_seal {
+		s.begin_list(13 + self.seal.len());
+	} else {
+		s.begin_list(13);
+	}
+
+	s.append(&self.parent_hash);
+	s.append(&self.uncles_hash);
+	s.append(&self.author);
+	s.append(&self.state_root);
+	s.append(&self.transactions_root);
+	s.append(&self.receipts_root);
+	s.append(&self.log_bloom);
+	s.append(&self.difficulty);
+	s.append(&self.number);
+	s.append(&self.gas_limit);
+	s.append(&self.gas_used);
+	s.append(&self.timestamp);
+	s.append(&self.extra_data);
+
+	if let Seal::With = with_seal {
+		for b in &self.seal {
+			s.append_raw(b, 1);
+		}
+	}
+}
+```
+
 ### Finality
 Under the assumption of a synchronous network which propagates messages within the step duration `t`, let `SIG_SET(B)` be the set of signatures from all authors in the set of blocks `B`:
 
