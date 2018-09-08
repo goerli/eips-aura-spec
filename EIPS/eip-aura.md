@@ -9,10 +9,14 @@ created: 2018-09-08
 ---
 
 ## Simple Summary
-Aura is a basic consensus algorithm where only a defined set of users is allowed to _mine_ blocks.
+Aura is a basic consensus algorithm where only a defined set of users is able to _mine_ blocks.
 
 ## Abstract
-Aura (_Authority Round_) is a proof-of-authority blockchain consensus algorithm where only a defined set of validators is allowed to seal blocks.
+Aura (_Authority Round_) is a proof-of-authority blockchain consensus algorithm where only a defined set of validators is allowed to seal blocks. It's a protocol where instead of miners racing to find a solution to a difficult problem, authorized signers can create new blocks in a round-robin process at defined intervals.
+
+Aura is the consensus engine pioneered by [Parity Technologies](https://parity.io) in 2016 and used to power the [public Kovan testnet](https://medium.com/@Digix/announcing-kovan-a-stable-ethereum-public-testnet-10ac7cb6c85f) which was established after the [Ropsten spam-attacks](https://ethereum.stackexchange.com/questions/12477/ropsten-testnet-is-under-kind-of-attack-what-can-we-do) in 2017. In addition, public value-bearing networks, such as [POA Network](https://poa.network/), are based on the Aura protocol.
+
+This document is _informational_ to summarize all available technical specification of the consensus engine to allow other client developer teams an overview, a place for feedback, and potentially the foundation to implement this in other code bases.
 
 ## Motivation
 The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
