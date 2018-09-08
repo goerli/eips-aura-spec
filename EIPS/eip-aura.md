@@ -19,7 +19,7 @@ Aura is the consensus engine pioneered by [Parity Technologies](https://parity.i
 This document is _informational_ to summarize all available technical specification of the consensus engine to allow other client developer teams an overview, a place for feedback, and potentially the foundation to implement this in other code bases.
 
 ## Motivation
-Networks not bearing any value cannot be sufficiently secured with proof-of-work or proof-of-stake. This circumstance is uniquely right for test networks that are supposed to be a reliable platform for developers to deploy and test their applications. Therefore, a proof-of-authority scheme is proposed which provides sufficient resistance against network attacks in testnets without attached value.
+Networks not bearing any value cannot be sufficiently secured with proof-of-work or proof-of-stake. This circumstance is uniquely right for test networks that are supposed to be a reliable platform for developers to deploy and test their applications. Therefore, a proof-of-authority scheme is proposed which provides sufficient resistance against network attacks in testnets without any value attached.
 
 ## Specification
 The following sections technically specify the Authority Round consensus protocol.
@@ -29,21 +29,19 @@ The following sections technically specify the Authority Round consensus protoco
   - `f`, the number of faulty validator nodes
   - `s`, the step ID
   - `t`, the step duration in seconds
+  - `h`, the best block height
+  - `C[K]`, the chain `C` at some denoted point `K`
 
 ### Authority Round Description
 Time is divided into discrete steps of duration `t`, determined by:
 
 ![Formula 00](../assets/eip-aura/00-unix-time.png)
 
-At each step `s`, a _primary_ is assigned. Only the primary at a step may issue a block. It is misbehavior to produce more than one block per step or to produce a block out of turn.
-
-The primary for a step `s` is the node with index:
+At each step `s`, a _primary_ is assigned. Only the primary at a step may issue a block. It is misbehavior to produce more than one block per step or to produce a block out of turn. The primary for a step `s` is the validator node with index:
 
 ![Formula 01](../assets/eip-aura/01-s-bmod-n.png)
 
-The protocol contains a chain scoring rule `SCORE(C)` for a given chain `C`.
-
-On each step, each honest node propagates the chain with the highest score it knows about to all other nodes. Honest primaries only issue blocks on top of the best chain they are aware of during their turn.
+The protocol contains a chain scoring rule `SCORE(C)` for a given chain `C`. On each step, each honest node propagates the chain with the highest score it knows about to all other nodes. Honest primaries only issue blocks on top of the best chain they are aware of during their turn.
 
 ### Finality
 Under the assumption of a synchronous network which propagates messages within the step duration `t`, let `SIG_SET(B)` be the set of signatures from all authors in the set of blocks `B`:
@@ -54,9 +52,7 @@ If there is a valid chain `C` ending with `C[K..]`, where:
 
 ![Formula 03](../assets/eip-aura/03-sig-set-ck.png)
 
-then `C[K]` and all of its ancestors are finalized.
-
-This definition of finality stems from a simple majority vote. In this setting:
+then `C[K]` and all of its ancestors are finalized. This definition of finality stems from a simple majority vote. In this setting:
 
 ![Formula 04](../assets/eip-aura/04-2f-leq-n.png)
 
@@ -79,8 +75,8 @@ A simple list of addresses specified at genesis, i.e.:
 }
 ```
 
-#### (Optional:) Contracts
-The list can be also a part of the blockchain state by being stored in an Ethereum contract.
+#### Contracts
+_(Optional:)_ The list can be also a part of the blockchain state by being stored in an Ethereum contract.
 
 It is best to include the contract in the genesis placing the bytecode as a "constructor" in the "accounts" field. If the constructor takes arguments, they must be encoded and appended to the contract bytecode (using, e.g., [`ethabi`](https://github.com/paritytech/ethabi)). Also if the contract initializes any address with `msg.sender` (for example as a contract owner) you must take into account that when defining the contract in genesis, `msg.sender` is set to the system address (`SYSTEM_ADDRESS`: `2^160 - 2`).
 
@@ -119,16 +115,15 @@ contract ValidatorSet {
 }
 ```
 
-There is a notion of an "active" validator set: this is the set of the most recently finalized signal (`InitiateChange` event). The initial set is
+There is a notion of an "active" validator set: this is the set of the most recently finalized signal (`InitiateChange` event) or the initial set if no changes have been finalized. The function `getValidators` should always return the active set or the initial set if the contract hasn't been activated yet.
 
-The function `getValidators` should always return the active set or the initial set if the contract hasn't been activated yet.
 Switching the set should be done by issuing an `InitiateChange` event with the parent block hash and the new set, storing the pending set, and then waiting for a call to `finalizeChange` (by the `SYSTEM_ADDRESS`: `2^160 - 2`) before setting the active set to the pending set. This mechanism is used to ensure that the previous validator set "signs off" on the changes before activation, leading to full security in situations like warp and light sync, where state transitions aren't checked.
 
 Other than these restrictions, the switching rules are fully determined by the contract implementing that method. The spec should contain the contract address:
 
 ```json
 "validators": {
-    "safeContract": "0x0000000000000000000000000000000000000005"
+    "safeContract": "0x0000000000000000000000000000000000000009"
 }
 ```
 
@@ -137,9 +132,7 @@ Sometimes one might want to take action automatically when one of the validators
 - benign misbehaviour
 - malicious misbehaviour
 
-Benign misbehaviour in Aura may be simply not receiving a block from a designated primary, while malicious misbehaviour would be releasing two different blocks for the same step.
-
-This type of contract can listen to misbehaviour reports from the consensus engine and decide what the consequences for the validators are.
+Benign misbehaviour in Aura may be simply not receiving a block from a designated primary, while malicious misbehaviour would be releasing two different blocks for the same step. This type of contract can listen to misbehaviour reports from the consensus engine and decide what the consequences for the validators are.
 
 The correct interface is:
 ```json
@@ -151,33 +144,30 @@ which corresponds to this Solidity contract definition:
 contract ReportingValidatorSet {
     // all same as ValidatorSet
     event InitiateChange(bytes32 indexed _parent_hash, address[] _new_set);
-
     function getValidators() constant returns (address[] _validators);
     function finalizeChange();
 
     // Reporting functions: operate on current validator set.
     // malicious behavior requires proof, which varies by the engine.
-
     function reportBenign(address validator, uint256 blockNumber);
     function reportMalicious(address validator, uint256 blockNumber, bytes proof);
 }
 ```
 
 `InitiateChange`, `getValidators` and `finalizeChange` should function exactly as in a non-reporting contract.
-There are two new functions, `reportBenign` and `reportMalicious`. Each should come with the address of a validator being reported and the block number at which misbehavior occurred. `reportMalicious` also requires a proof of malice, which is an arbitrary byte-string which different engines set to different values. Validators call these when they detect misbehavior.
 
-These should function on only the current active validator set.
+There are two new functions, `reportBenign` and `reportMalicious`. Each should come with the address of a validator being reported and the block number at which misbehavior occurred. `reportMalicious` also requires a proof of malice, which is an arbitrary byte-string which different engines set to different values. Validators call these when they detect misbehavior. These should function on only the current active validator set.
 
 It is specified as:
 
 ```json
 "validators": {
-    "contract": "0x0000000000000000000000000000000000000005"
+    "contract": "0x0000000000000000000000000000000000000009"
 }
 ```
 
-#### (Optional:) Multiset
-This validator set can specify any combination of other validator sets. Switching is done based on the number of the current block. It can be useful for conducting chain forks. The first set has to start at block 0.
+#### Multiset
+_(Optional:)_ This validator set can specify any combination of other validator sets. Switching is done based on the number of the current block. It can be useful for conducting chain forks. The first set has to start at block 0.
 
 ```json
 "validators": {
@@ -189,15 +179,13 @@ This validator set can specify any combination of other validator sets. Switchin
             ]
         },
         "100": {
-            "contract": "0x0000000000000000000000000000000000000005"
+            "contract": "0x0000000000000000000000000000000000000009"
         }
     }
 }
 ```
 
-Note that transitions to a contract won't take effect immediately. Rather, they take effect when the previous set of validators finalizes the block. Again, this is to provide full security for warp and light sync.
-
-Transitions to a fixed list take effect immediately because regardless of whether an attacker gives a light client a transition block with an invalid state, the subsequent validator set is always the same.
+Note that transitions to a contract won't take effect immediately. Rather, they take effect when the previous set of validators finalizes the block. Again, this is to provide full security for warp and light sync. Transitions to a fixed list take effect immediately because regardless of whether an attacker gives a light client a transition block with an invalid state, the subsequent validator set is always the same.
 
 #### Limitations
 
