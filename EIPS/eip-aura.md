@@ -209,7 +209,7 @@ _(Optional:)_ In order to reach finality in a timely fashion it is necessary for
 _(Optional:)_ The maximum number of accepted ommers should be limited and configurable. While Ethash defaults to `2`, it's recommended to default Aura engines to a maximum of `0` ommers to avoid unnecessary chain reorgs.
 
 ## Rationale
-The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
+An alternate proof-of-authority standard is [_Clique_ proposed by Péter Szilágyi in March 2017](https://github.com/ethereum/EIPs/issues/225). The Clique engine is implemented in Geth and powering the [Rinkeby test network](https://www.rinkeby.io/).
 
 ## Implementation
 The Parity Ethereum client contains a [feature-complete implementation of the Aura engine](https://wiki.parity.io/Pluggable-Consensus). The public Kovan testnet can be regarded as [show-case for Aura](https://kovan-stats.parity.io/).
