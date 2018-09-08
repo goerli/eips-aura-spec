@@ -32,13 +32,13 @@ The following technically specifies the Authority Round consensus protocol.
 #### Description
 Time is divided into discrete steps of duration `t`, determined by:
 
-![Formula 00](../assets/eips-aura/00-unix-time.png)
+![Formula 00](../assets/eip-aura/00-unix-time.png)
 
 At each step `s`, a _primary_ will be assigned. Only the primary at a step may issue a block. It is misbehavior to produce more than one block per step or to produce a block out of turn.
 
 The primary for a step `s` is the node with index:
 
-![Formula 01](../assets/eips-aura/01-s-bmod-n.png)
+![Formula 01](../assets/eip-aura/01-s-bmod-n.png)
 
 The protocol contains a chain scoring rule `SCORE(C)` for a given chain `C`.
 
@@ -47,17 +47,17 @@ On each step, each honest node will propagate the chain with the highest score i
 #### Finality
 Under the assumption of a synchronous network which propagates messages within the step duration `t`, let `SIG_SET(B)` be the set of signatures from all authors in the set of blocks `B`:
 
-![Formula 02](../assets/eips-aura/02-sig-set-b.png)
+![Formula 02](../assets/eip-aura/02-sig-set-b.png)
 
 If there is a valid chain `C` ending with `C[K..]`, where:
 
-![Formula 03](../assets/eips-aura/03-sig-set-ck.png)
+![Formula 03](../assets/eip-aura/03-sig-set-ck.png)
 
 then `C[K]` and all of its ancestors are finalized.
 
 This definition of finality stems from a simple majority vote. In this setting:
 
-![Formula 04](../assets/eips-aura/04-2f-leq-n.png)
+![Formula 04](../assets/eip-aura/04-2f-leq-n.png)
 
 so the faulty nodes cannot finalize a block all on their own.
 
