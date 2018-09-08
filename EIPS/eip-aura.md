@@ -19,7 +19,7 @@ Aura is the consensus engine pioneered by [Parity Technologies](https://parity.i
 This document is _informational_ to summarize all available technical specification of the consensus engine to allow other client developer teams an overview, a place for feedback, and potentially the foundation to implement this in other code bases.
 
 ## Motivation
-
+Networks not bearing any value can not be sufficiently secured with proof-of-work or proof-of-stake. This is especially true for test networks that are supposed to be a reliable platform for developers to deploy and test their applications. Therefore, a proof-of-authority scheme is proposed which provides sufficient resistance against network attacks in testnets without attached value.
 
 ## Specification
 The following sections technically specifies the Authority Round consensus protocol.
