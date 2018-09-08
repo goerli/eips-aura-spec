@@ -202,7 +202,6 @@ Transitions to a fixed list will take effect immediately because regardless of w
 Currently events emitted by the validator set contract when the engine calls `finalizeChange` are not observable. This is a limitation of how "system" transactions are implemented at the moment.
 
 ### Supplementary features
-
 _(Optional:)_ The consensus can be run with _force sealing_ which ensures that blocks are produced even if there are no transactions. This is necessary for blocks to reach finality in a timely fashion. _(to be specified in detail)_
 
 _(Optional:)_ In order to reach finality in a timely fashion it is necessary for the nodes to keep sealing blocks even when there are no transactions. To reduce blockchain bloat while still maintaining the same finality guarantees the nodes can sign and broadcast an `EmptyStep(step, parent_hash)` message instead of producing an empty block. All of the nodes accumulate the broadcasted empty step messages and they are included and rewarded in the next non-empty block. The empty step messages included in blocks are also taken into account for finality.
@@ -210,14 +209,8 @@ _(Optional:)_ In order to reach finality in a timely fashion it is necessary for
 ## Rationale
 The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
-## Backwards Compatibility
-All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
-
-## Test Cases
-Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.
-
 ## Implementation
-The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.
+The Parity Ethereum client contains a [feature-complete implementation of the Aura engine](https://wiki.parity.io/Pluggable-Consensus). The public Kovan testnet can be regarded as [show-case for Aura](https://kovan-stats.parity.io/).
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
