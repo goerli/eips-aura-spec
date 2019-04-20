@@ -1,7 +1,7 @@
 ---
 eip: 0000
 title: Cliquey proof-of-authority consensus protocol
-author: Talha Cross(@soc1c) & Aidan Hyman (@ChainSafeSystems)
+author: Aidan Hyman (@ChainSafeSystems), Talha Cross (@soc1c)
 discussions-to: https://github.com/goerli/eips-poa
 status: Draft
 type: Standards Track
